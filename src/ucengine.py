@@ -12,10 +12,14 @@ class UCEngine(object):
 		self.host = host
 		self.port = port
 		self.users = []
-	def request(self, method, path, body):
+	def request(self, method, path, body=None):
 		connection = httplib.HTTPConnection(self.host, self.port)
-		connection.request(method, '/api/0.4/%s' % path,
-			urllib.urlencode(body),headers = {'Host': 'localhost'})
+		if body != None:
+			connection.request(method, '/api/0.4/%s' % path,
+				urllib.urlencode(body),headers = {'Host': 'localhost'})
+		else:
+			connection.request(method, '/api/0.4/%s' % path,
+				headers = {'Host': 'localhost'})
 		r = connection.getresponse()
 		response = json.loads(r.read())
 		connection.close()
@@ -33,7 +37,17 @@ class User(object):
 			)
 		if status == 201:
 			self.sid = p['result']
+	def time(self):
+		status, p = self.ucengine.request('GET', 'time?%s' % urllib.urlencode({
+			'uid': self.uid, 'sid': self.sid}))
+		return p['result']
+	def infos(self):
+		status, p = self.ucengine.request('GET', 'infos?%s' % urllib.urlencode({
+			'uid': self.uid, 'sid': self.sid}))
+		return p['result']
 
 ucengine = UCEngine('192.168.1.142', 5280)
 victor = User('victor.goya@af83.com')
 victor.presence(ucengine, 'pwd')
+print victor.time()
+print victor.infos()
