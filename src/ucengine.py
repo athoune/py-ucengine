@@ -16,10 +16,9 @@ class UCEngine(object):
 		connection = httplib.HTTPConnection(self.host, self.port)
 		if body != None:
 			connection.request(method, '/api/0.4/%s' % path,
-				urllib.urlencode(body),headers = {'Host': 'localhost'})
+				urllib.urlencode(body))
 		else:
-			connection.request(method, '/api/0.4/%s' % path,
-				headers = {'Host': 'localhost'})
+			connection.request(method, '/api/0.4/%s' % path)
 		r = connection.getresponse()
 		response = json.loads(r.read())
 		connection.close()
@@ -46,7 +45,7 @@ class User(object):
 			'uid': self.uid, 'sid': self.sid}))
 		return p['result']
 
-ucengine = UCEngine('192.168.1.142', 5280)
+ucengine = UCEngine('localhost', 5280)
 victor = User('victor.goya@af83.com')
 victor.presence(ucengine, 'pwd')
 print victor.time()
