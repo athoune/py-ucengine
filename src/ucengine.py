@@ -1,6 +1,12 @@
+#!/usr/bin/env python
+
+__author__ = "mathieu@garambrogne.net"
+
 import json
+import time
 
 from gevent import monkey
+import gevent
 
 monkey.patch_all();
 
@@ -36,6 +42,23 @@ class User(object):
 			)
 		if status == 201:
 			self.sid = p['result']
+			self._event()
+	def _listen(self, start=None):
+		status, p = self.ucengine.request('GET', 'event?%s' % urllib.urlencode({
+			'uid': self.uid,
+			'sid': self.sid,
+			'_async': 'lp',
+			'start': start
+		}))
+		self.onEvent((status, p))
+		self._event(int(time.time()))
+	def _event(self, start=None):
+		if start == None:
+			start = int(time.time())
+		gevent.spawn(self._listen, start)
+	def onEvent(self, resp):
+		time.sleep(2)
+		print resp
 	def time(self):
 		status, p = self.ucengine.request('GET', 'time?%s' % urllib.urlencode({
 			'uid': self.uid, 'sid': self.sid}))
@@ -45,8 +68,13 @@ class User(object):
 			'uid': self.uid, 'sid': self.sid}))
 		return p['result']
 
-ucengine = UCEngine('localhost', 5280)
-victor = User('victor.goya@af83.com')
-victor.presence(ucengine, 'pwd')
-print victor.time()
-print victor.infos()
+if __name__ == '__main__':
+	#launch demo:start(). on the server
+	ucengine = UCEngine('localhost', 5280)
+	victor = User('victor.goya@af83.com')
+	victor.presence(ucengine, 'pwd')
+	time.sleep(1)
+	print victor.time()
+	time.sleep(1)
+	print victor.infos()
+time.sleep(10)
