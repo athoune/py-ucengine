@@ -1,7 +1,7 @@
 import sys
 import unittest
 sys.path.append('../src')
-from ucengine import UCEngine, User
+from ucengine import UCEngine, User, Meeting
 
 class TestBasic(unittest.TestCase):
 	def setUp(self):
@@ -17,6 +17,12 @@ class TestBasic(unittest.TestCase):
 	def test_infos(self):
 		infos = self.victor.infos()
 		self.assertEquals(u'localhost', infos['domain'])
+	def test_meeting(self):
+		thierry = User('thierry.bomandouki@af83.com')
+		thierry.presence(self.uce, 'pwd')
+		self.victor.join(Meeting('demo'))
+		thierry.join(Meeting('demo'))
+		thierry.meetings['demo'].chat("Bonjour monde", 'fr')
 
 if __name__ == '__main__':
 	unittest.main()

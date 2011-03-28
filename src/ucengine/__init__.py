@@ -40,6 +40,7 @@ class User(object):
 	def __init__(self, uid):
 		self.uid = uid
 		self.event_pid = None
+		self.meetings = {}
 	#def __del__(self):
 	#	if self.event_pid != None:
 	#		self.unpresence()
@@ -73,9 +74,11 @@ class User(object):
 				'start': start
 				}))
 			start = int(time.time())
-			self.onEvent((status, p))
-	def onEvent(self, resp):
-		print resp
+			if status == 200:
+				for event in p['result']:
+					self.onEvent(event['type'], event)
+	def onEvent(self, type, event):
+		print event
 	def time(self):
 		status, p = self.ucengine.request('GET', '/time?%s' % urllib.urlencode({
 			'uid': self.uid, 'sid': self.sid}))
@@ -83,4 +86,45 @@ class User(object):
 	def infos(self):
 		status, p = self.ucengine.request('GET', '/infos?%s' % urllib.urlencode({
 			'uid': self.uid, 'sid': self.sid}))
+		return p['result']
+	def join(self, duck):
+		duck._join(self)
+
+class Meeting(object):
+	def __init__(self, meeting):
+		self.meeting = meeting
+	def _join(self, user):
+		status, p = user.ucengine.request('POST', '/meeting/all/%s/roster/' % self.meeting, {
+			'uid': user.uid,
+			'sid': user.sid
+		})
+		assert status == 200
+		self.ucengine = user.ucengine
+		self.user = user
+		user.meetings[self.meeting] = self
+		self.event_pid = gevent.spawn(self._listen)
+	def _listen(self):
+		start = int(time.time())
+		while True:
+			status, p = self.ucengine.request('GET', '/event/%s?%s' % (self.meeting, urllib.urlencode({
+				'uid': self.user.uid,
+				'sid': self.user.sid,
+				'_async': 'lp',
+				'start': start
+				})))
+			start = int(time.time())
+			if status == 200:
+				for event in p['result']:
+					self.onEvent(event['type'], event)
+	def onEvent(self, type, event):
+		print self.meeting, event
+	def chat(self, text, lang='en'):
+		status, p = self.ucengine.request('POST', '/event/%s' % self.meeting, {
+			'uid': self.user.uid,
+			'sid': self.user.sid,
+			'type': 'chat.message.new',
+			'metadata[lang]': lang,
+			'metadata[text]': text
+		})
+		assert status == 201
 		return p['result']
