@@ -1,4 +1,5 @@
 import sys
+import time
 import unittest
 sys.path.append('../src')
 from ucengine import UCEngine, User, UCError
@@ -30,13 +31,21 @@ class TestBasic(unittest.TestCase):
 		thierry.presence(self.uce, 'pwd')
 		SESSION = 'demo'
 		MSG = u"Bonjour monde"
-		self.victor.join_meeting(SESSION)
 		def _m(event):
 			self.assertEquals(event['metadata']['text'], MSG)
-			print event
-		self.victor.meetings[SESSION].callbacks['chat.message.new'] = _m
-		thierry.join_meeting(SESSION)
+			#print event
+		self.victor.meetings[SESSION].callback('chat.message.new', _m)
+		thierry.meetings[SESSION].callback('chat.message.new', _m)
+		self.victor.meetings[SESSION].join()
+		thierry.meetings[SESSION].join()
 		thierry.meetings[SESSION].chat(MSG, 'fr')
+		time.sleep(1)
+		self.assertEquals(
+			set([u'victor.goya@af83.com', u'thierry.bomandouki@af83.com']),
+			self.victor.meetings[SESSION].roster)
+		self.assertEquals(
+			set([u'#ucengine', u'#sinek', u'#simonsinek', u'#TED']),
+			self.victor.meetings[SESSION].twitter_hash_tags)
 
 if __name__ == '__main__':
 	unittest.main()
