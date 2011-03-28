@@ -87,8 +87,8 @@ class User(object):
 		status, p = self.ucengine.request('GET', '/infos?%s' % urllib.urlencode({
 			'uid': self.uid, 'sid': self.sid}))
 		return p['result']
-	def join(self, duck):
-		duck._join(self)
+	def join_meeting(self, meeting):
+		Meeting(meeting)._join(self)
 
 class Meeting(object):
 	def __init__(self, meeting):
@@ -112,12 +112,13 @@ class Meeting(object):
 				'_async': 'lp',
 				'start': start
 				})))
-			start = int(time.time())
 			if status == 200:
 				for event in p['result']:
+					start = event['datetime']
 					self.onEvent(event['type'], event)
 	def onEvent(self, type, event):
-		print self.meeting, event
+		if type == "chat.message.new":
+			print "%s#%s" % (self.user.uid, self.meeting), event
 	def chat(self, text, lang='en'):
 		status, p = self.ucengine.request('POST', '/event/%s' % self.meeting, {
 			'uid': self.user.uid,

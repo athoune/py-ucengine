@@ -20,9 +20,10 @@ class TestBasic(unittest.TestCase):
 	def test_meeting(self):
 		thierry = User('thierry.bomandouki@af83.com')
 		thierry.presence(self.uce, 'pwd')
-		self.victor.join(Meeting('demo'))
-		thierry.join(Meeting('demo'))
-		thierry.meetings['demo'].chat("Bonjour monde", 'fr')
+		SESSION = 'demo'
+		self.victor.join_meeting(SESSION)
+		thierry.join_meeting(SESSION)
+		thierry.meetings[SESSION].chat("Bonjour monde", 'fr')
 
 if __name__ == '__main__':
 	unittest.main()
