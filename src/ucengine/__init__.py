@@ -67,14 +67,3 @@ class User(object):
 		status, p = self.ucengine.request('GET', 'infos?%s' % urllib.urlencode({
 			'uid': self.uid, 'sid': self.sid}))
 		return p['result']
-
-if __name__ == '__main__':
-	#launch demo:start(). on the server
-	ucengine = UCEngine('localhost', 5280)
-	victor = User('victor.goya@af83.com')
-	victor.presence(ucengine, 'pwd')
-	time.sleep(1)
-	print victor.time()
-	time.sleep(1)
-	print victor.infos()
-time.sleep(10)
