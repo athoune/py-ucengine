@@ -93,6 +93,7 @@ class User(object):
 class Meeting(object):
 	def __init__(self, meeting):
 		self.meeting = meeting
+		self.callbacks = {}
 	def _join(self, user):
 		status, p = user.ucengine.request('POST', '/meeting/all/%s/roster/' % self.meeting, {
 			'uid': user.uid,
@@ -117,8 +118,10 @@ class Meeting(object):
 					start = event['datetime']
 					self.onEvent(event['type'], event)
 	def onEvent(self, type, event):
-		if type == "chat.message.new":
-			print "%s#%s" % (self.user.uid, self.meeting), event
+		if type in self.callbacks:
+			self.callbacks[type](event)
+		# if type == "chat.message.new":
+		# 	print "%s#%s" % (self.user.uid, self.meeting), event
 	def chat(self, text, lang='en'):
 		status, p = self.ucengine.request('POST', '/event/%s' % self.meeting, {
 			'uid': self.user.uid,

@@ -22,6 +22,9 @@ class TestBasic(unittest.TestCase):
 		thierry.presence(self.uce, 'pwd')
 		SESSION = 'demo'
 		self.victor.join_meeting(SESSION)
+		def _m(self, event):
+			print event
+		self.victor.callback['chat.message.new'] = _m
 		thierry.join_meeting(SESSION)
 		thierry.meetings[SESSION].chat("Bonjour monde", 'fr')
 
