@@ -1,7 +1,7 @@
 import sys
 import unittest
 sys.path.append('../src')
-from ucengine import UCEngine, User
+from ucengine import UCEngine, User, UCError
 
 class TestBasic(unittest.TestCase):
 	def setUp(self):
@@ -12,6 +12,14 @@ class TestBasic(unittest.TestCase):
 		self.victor.unpresence()
 	def test_presence(self):
 		self.assertTrue(None != self.victor.sid)
+	def test_bad_presence(self):
+		thierry = User('thierry.bomandouki@af83.com')
+		try:
+			thierry.presence(self.uce, '****')
+		except UCError as e:
+			self.assertEquals(403, e.code)
+		else:
+			self.assertTrue(False)
 	def test_time(self):
 		time = self.victor.time()
 	def test_infos(self):
@@ -23,8 +31,8 @@ class TestBasic(unittest.TestCase):
 		SESSION = 'demo'
 		MSG = u"Bonjour monde"
 		self.victor.join_meeting(SESSION)
-		def _m(self, event):
-			assert event['metadata']['text'] == MSG
+		def _m(event):
+			self.assertEquals(event['metadata']['text'], MSG)
 			print event
 		self.victor.meetings[SESSION].callbacks['chat.message.new'] = _m
 		thierry.join_meeting(SESSION)

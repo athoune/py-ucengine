@@ -14,10 +14,11 @@ import httplib
 import urllib
 
 class UCError(Exception):
-	def __init__(self, value):
+	def __init__(self, code, value):
+		self.code = code
 		self.value = value
 	def __repr__(self):
-		return "<UCError %s>" % self.value
+		return "<UCError:%i %s>" % (self.code, self.value)
 
 class UCEngine(object):
 	def __init__(self, host, port):
@@ -55,14 +56,14 @@ class User(object):
 			self.sid = p['result']
 			self.event_pid = gevent.spawn(self._listen)
 		else:
-			raise UCError(p)
+			raise UCError(status, p)
 	def unpresence(self):
 		status, p = self.ucengine.request('DELETE','/presence/%s?%s' % (self.sid, urllib.urlencode({
 			'uid': self.uid,
 			'sid': self.sid}))
 			)
 		if status != 200:
-			raise UCError(p)
+			raise UCError(status, p)
 		self.event_pid.kill()
 	def _listen(self):
 		start = int(time.time())
@@ -105,7 +106,7 @@ class Meeting(object):
 		user.meetings[self.meeting] = self
 		self.event_pid = gevent.spawn(self._listen)
 	def _listen(self):
-		start = int(time.time())
+		start = 0
 		while True:
 			status, p = self.ucengine.request('GET', '/event/%s?%s' % (self.meeting, urllib.urlencode({
 				'uid': self.user.uid,
@@ -119,7 +120,7 @@ class Meeting(object):
 					self.onEvent(event['type'], event)
 	def onEvent(self, type_, event):
 		if type_ in self.callbacks:
-			self.callbacks[type_](self, event)
+			self.callbacks[type_](event)
 		# else:
 		# 	print type_
 	def chat(self, text, lang='en'):
