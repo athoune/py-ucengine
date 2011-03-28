@@ -39,7 +39,7 @@ class TestBasic(unittest.TestCase):
 		self.victor.meetings[SESSION].join()
 		thierry.meetings[SESSION].join()
 		thierry.meetings[SESSION].chat(MSG, 'fr')
-		time.sleep(1)
+		time.sleep(0.1) # tricks to fetch events
 		self.assertEquals(
 			set([u'victor.goya@af83.com', u'thierry.bomandouki@af83.com']),
 			self.victor.meetings[SESSION].roster)
