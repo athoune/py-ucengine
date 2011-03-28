@@ -8,10 +8,12 @@ class TestBasic(unittest.TestCase):
 		self.uce = UCEngine('localhost', 5280)
 		self.victor = User('victor.goya@af83.com')
 		self.victor.presence(self.uce, 'pwd')
+	def tearDown(self):
+		self.victor.unpresence()
 	def test_presence(self):
 		self.assertTrue(None != self.victor.sid)
 	def test_time(self):
-		self.victor.time()
+		time = self.victor.time()
 	def test_infos(self):
 		infos = self.victor.infos()
 		self.assertEquals(u'localhost', infos['domain'])
