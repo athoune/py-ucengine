@@ -115,13 +115,13 @@ class Meeting(object):
 				})))
 			if status == 200:
 				for event in p['result']:
-					start = event['datetime']
+					start = event['datetime'] + 1
 					self.onEvent(event['type'], event)
-	def onEvent(self, type, event):
-		if type in self.callbacks:
-			self.callbacks[type](event)
-		# if type == "chat.message.new":
-		# 	print "%s#%s" % (self.user.uid, self.meeting), event
+	def onEvent(self, type_, event):
+		if type_ in self.callbacks:
+			self.callbacks[type_](self, event)
+		# else:
+		# 	print type_
 	def chat(self, text, lang='en'):
 		status, p = self.ucengine.request('POST', '/event/%s' % self.meeting, {
 			'uid': self.user.uid,

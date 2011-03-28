@@ -1,7 +1,7 @@
 import sys
 import unittest
 sys.path.append('../src')
-from ucengine import UCEngine, User, Meeting
+from ucengine import UCEngine, User
 
 class TestBasic(unittest.TestCase):
 	def setUp(self):
@@ -21,12 +21,14 @@ class TestBasic(unittest.TestCase):
 		thierry = User('thierry.bomandouki@af83.com')
 		thierry.presence(self.uce, 'pwd')
 		SESSION = 'demo'
+		MSG = u"Bonjour monde"
 		self.victor.join_meeting(SESSION)
 		def _m(self, event):
+			assert event['metadata']['text'] == MSG
 			print event
-		self.victor.callback['chat.message.new'] = _m
+		self.victor.meetings[SESSION].callbacks['chat.message.new'] = _m
 		thierry.join_meeting(SESSION)
-		thierry.meetings[SESSION].chat("Bonjour monde", 'fr')
+		thierry.meetings[SESSION].chat(MSG, 'fr')
 
 if __name__ == '__main__':
 	unittest.main()
