@@ -134,6 +134,7 @@ class Meeting(object):
 				event['metadata']['hashtag'])
 		}
 	def callback(self, key, cback):
+		"register a new callback"
 		self.callbacks[key] = cback
 	def join(self):
 		"Joining the meeting"
@@ -157,12 +158,10 @@ class Meeting(object):
 			if status == 200:
 				for event in resp['result']:
 					start = event['datetime'] + 1
-					self.on_event(event['type'], event)
-	def on_event(self, type_, event):
-		if type_ in self.callbacks:
-			gevent.spawn(self.callbacks[type_], event)
-		else:
-			print type_, event
+					if event['type'] in self.callbacks:
+						gevent.spawn(self.callbacks[event['type']], event)
+					else:
+						print event['type'], event
 	def chat(self, text, lang='en'):
 		"Talking to the meeting"
 		status, resp = self.ucengine.request('POST', '/event/%s' % self.meeting, {
