@@ -63,6 +63,7 @@ class Eventualy(object):
 	def callback(self, key, cback):
 		"register a new callback"
 		self.callbacks[key] = cback
+		return self
 	def event_loop(self, url):
 		"launch the backround event listening"
 		def _listen():
@@ -159,6 +160,7 @@ class Meeting(Eventualy):
 			'sid': self.user.sid,
 			'_async': 'lp'
 		})))
+		return self
 	def chat(self, text, lang='en'):
 		"Talking to the meeting"
 		status, resp = self.ucengine.request('POST',
@@ -173,3 +175,4 @@ class Meeting(Eventualy):
 		return resp['result']
 	def async_chat(self, text, lang='en'):
 		gevent.spawn(self.chat, text, lang)
+		return self

@@ -34,13 +34,11 @@ class TestBasic(unittest.TestCase):
 		def _m(event):
 			self.assertEquals(event['metadata']['text'], MSG)
 			#print event
-		self.victor.meetings[SESSION].callback('chat.message.new', _m)
-		thierry.meetings[SESSION].callback('chat.message.new', _m)
-		self.victor.meetings[SESSION].join()
-		thierry.meetings[SESSION].join()
+		self.victor.meetings[SESSION].callback('chat.message.new', _m).join()
+		thierry.meetings[SESSION].callback('chat.message.new', _m).join()
 		thierry.meetings[SESSION].chat(MSG, 'fr')
 		self.victor.meetings[SESSION].async_chat(MSG, 'fr')
-		time.sleep(0.1) # tricks to fetch events
+		time.sleep(0.1) # waiting for events
 		self.assertEquals(
 			set([u'victor.goya@af83.com', u'thierry.bomandouki@af83.com']),
 			self.victor.meetings[SESSION].roster)
