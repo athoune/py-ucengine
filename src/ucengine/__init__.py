@@ -160,7 +160,7 @@ class Meeting(object):
 					self.on_event(event['type'], event)
 	def on_event(self, type_, event):
 		if type_ in self.callbacks:
-			self.callbacks[type_](event)
+			gevent.spawn(self.callbacks[type_], event)
 		else:
 			print type_, event
 	def chat(self, text, lang='en'):
