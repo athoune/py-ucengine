@@ -7,7 +7,7 @@ Async is handled with [gevent](http://www.gevent.org/).
 Status
 ------
 
-early alpha.
+Minimalistic implementation.
 
 Install
 -------
@@ -30,13 +30,22 @@ And the test (Python side)
 API
 ---
 
+	# an engine
 	uce = UCEngine('localhost', 5280)
+	# a user
 	victor = User('victor.goya@af83.com')
+	# connecting
 	victor.presence(uce, 'pwd')
+	# asking hour to the server
 	print victor.time()
+	# registering callback. Meeting creation is lazy
 	victor.meetings['demo'].callback('chat.message.new', lambda event: print event)
+	# joining
 	victor.meetings['demo'].join()
+	# fire and forget a message
 	victor.meetings['demo'].async_chat('bonjour Monde', 'fr')
+
+The callback should print the event
 
 Code
 ----
