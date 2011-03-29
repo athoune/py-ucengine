@@ -55,68 +55,6 @@ class Meetings(object):
 			self.meetings[meeting].user = self.user
 		return self.meetings[meeting]
 
-class User(object):
-	"A user"
-	def __init__(self, uid):
-		self.uid = uid
-		self.event_pid = None
-		self.sid = None
-		self.ucengine = None
-		self.meetings = Meetings(self)
-	#def __del__(self):
-	#	if self.event_pid != None:
-	#		self.unpresence()
-	def presence(self, uce, credential):
-		"I'm coming"
-		self.ucengine = uce
-		status, resp = self.ucengine.request('POST', '/presence/', {
-			'uid':self.uid,
-			'credential':credential,
-			'metadata[nickname]': self.uid}
-			)
-		if status == 201:
-			self.sid = resp['result']
-			self.event_pid = gevent.spawn(self._listen)
-		else:
-			raise UCError(status, resp)
-	def unpresence(self):
-		"I'm leaving"
-		status, resp = self.ucengine.request('DELETE',
-			'/presence/%s?%s' % (self.sid, urllib.urlencode({
-				'uid': self.uid,
-				'sid': self.sid}))
-				)
-		if status != 200:
-			raise UCError(status, resp)
-		self.event_pid.kill()
-	def _listen(self):
-		start = int(time.time())
-		while True:
-			status, resp = self.ucengine.request('GET', '/event?%s' % urllib.urlencode({
-				'uid': self.uid,
-				'sid': self.sid,
-				'_async': 'lp',
-				'start': start
-				}))
-			start = int(time.time())
-			if status == 200:
-				for event in resp['result']:
-					self.on_event(event['type'], event)
-	def on_event(self, type_, event):
-		print event
-	def time(self):
-		"What time is it"
-		status, resp = self.ucengine.request('GET', '/time?%s' % urllib.urlencode({
-			'uid': self.uid, 'sid': self.sid}))
-		assert status == 200
-		return resp['result']
-	def infos(self):
-		"Infos about the server"
-		status, resp = self.ucengine.request('GET', '/infos?%s' % urllib.urlencode({
-			'uid': self.uid, 'sid': self.sid}))
-		assert status == 200
-		return resp['result']
-
 class Eventualy(object):
 	"Dummy object implementing event loop"
 	def __init__(self):
@@ -138,6 +76,58 @@ class Eventualy(object):
 						else:
 							print event['type'], event
 		self.event_pid = gevent.spawn(_listen)
+
+class User(Eventualy):
+	"A user"
+	def __init__(self, uid):
+		Eventualy.__init__(self)
+		self.uid = uid
+		self.event_pid = None
+		self.sid = None
+		self.ucengine = None
+		self.meetings = Meetings(self)
+	#def __del__(self):
+	#	if self.event_pid != None:
+	#		self.unpresence()
+	def presence(self, uce, credential):
+		"I'm coming"
+		self.ucengine = uce
+		status, resp = self.ucengine.request('POST', '/presence/', {
+			'uid':self.uid,
+			'credential':credential,
+			'metadata[nickname]': self.uid}
+			)
+		if status == 201:
+			self.sid = resp['result']
+			self.event_loop('/event?%s' % urllib.urlencode({
+				'uid': self.uid,
+				'sid': self.sid,
+				'_async': 'lp'
+				}))
+		else:
+			raise UCError(status, resp)
+	def unpresence(self):
+		"I'm leaving"
+		status, resp = self.ucengine.request('DELETE',
+			'/presence/%s?%s' % (self.sid, urllib.urlencode({
+				'uid': self.uid,
+				'sid': self.sid}))
+				)
+		if status != 200:
+			raise UCError(status, resp)
+		self.event_pid.kill()
+	def time(self):
+		"What time is it"
+		status, resp = self.ucengine.request('GET', '/time?%s' % urllib.urlencode({
+			'uid': self.uid, 'sid': self.sid}))
+		assert status == 200
+		return resp['result']
+	def infos(self):
+		"Infos about the server"
+		status, resp = self.ucengine.request('GET', '/infos?%s' % urllib.urlencode({
+			'uid': self.uid, 'sid': self.sid}))
+		assert status == 200
+		return resp['result']
 
 class Meeting(Eventualy):
 	"A meeting (a room)"
