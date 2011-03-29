@@ -4,7 +4,6 @@ Client for UCEngine
 
 __author__ = "mathieu@garambrogne.net"
 
-
 import json
 import time
 
@@ -60,10 +59,12 @@ class Eventualy(object):
 	def __init__(self):
 		self.callbacks = {}
 		self.event_pid = None
+		self.ucengine = None
 	def callback(self, key, cback):
 		"register a new callback"
 		self.callbacks[key] = cback
 	def event_loop(self, url):
+		"launch the backround event listening"
 		def _listen():
 			start = 0
 			while True:
@@ -76,15 +77,16 @@ class Eventualy(object):
 						else:
 							print event['type'], event
 		self.event_pid = gevent.spawn(_listen)
+	def event_stop(self):
+		"stop the event loop"
+		self.event_pid.kill()
 
 class User(Eventualy):
 	"A user"
 	def __init__(self, uid):
 		Eventualy.__init__(self)
 		self.uid = uid
-		self.event_pid = None
 		self.sid = None
-		self.ucengine = None
 		self.meetings = Meetings(self)
 	#def __del__(self):
 	#	if self.event_pid != None:
@@ -115,7 +117,7 @@ class User(Eventualy):
 				)
 		if status != 200:
 			raise UCError(status, resp)
-		self.event_pid.kill()
+		self.event_stop()
 	def time(self):
 		"What time is it"
 		status, resp = self.ucengine.request('GET', '/time?%s' % urllib.urlencode({
@@ -133,7 +135,6 @@ class Meeting(Eventualy):
 	"A meeting (a room)"
 	def __init__(self, meeting):
 		Eventualy.__init__(self)
-		self.ucengine = None
 		self.user = None
 		self.meeting = meeting
 		self.roster = set()
@@ -170,3 +171,5 @@ class Meeting(Eventualy):
 			})
 		assert status == 201
 		return resp['result']
+	def async_chat(self, text, lang='en'):
+		gevent.spawn(self.chat, text, lang)
