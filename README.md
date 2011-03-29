@@ -26,3 +26,8 @@ And the test (Python side)
 
 	cd test
 	python basic.py
+
+Code
+----
+
+Validated with pyflakes and pylint -d W0312 (I love tabs)
