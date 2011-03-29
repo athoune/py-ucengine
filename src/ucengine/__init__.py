@@ -117,12 +117,34 @@ class User(object):
 		assert status == 200
 		return resp['result']
 
-class Meeting(object):
+class Eventualy(object):
+	"Dummy object implementing event loop"
+	def __init__(self):
+		self.callbacks = {}
+		self.event_pid = None
+	def callback(self, key, cback):
+		"register a new callback"
+		self.callbacks[key] = cback
+	def event_loop(self, url):
+		def _listen():
+			start = 0
+			while True:
+				status, resp = self.ucengine.request('GET', "%s&start=%i" % (url, start))
+				if status == 200:
+					for event in resp['result']:
+						start = event['datetime'] + 1
+						if event['type'] in self.callbacks:
+							gevent.spawn(self.callbacks[event['type']], event)
+						else:
+							print event['type'], event
+		self.event_pid = gevent.spawn(_listen)
+
+class Meeting(Eventualy):
 	"A meeting (a room)"
 	def __init__(self, meeting):
+		Eventualy.__init__(self)
 		self.ucengine = None
 		self.user = None
-		self.event_pid = None
 		self.meeting = meeting
 		self.roster = set()
 		self.twitter_hash_tags = set()
@@ -133,9 +155,6 @@ class Meeting(object):
 			'twitter.hashtag.add': lambda event: self.twitter_hash_tags.add(
 				event['metadata']['hashtag'])
 		}
-	def callback(self, key, cback):
-		"register a new callback"
-		self.callbacks[key] = cback
 	def join(self):
 		"Joining the meeting"
 		status, resp = self.ucengine.request('POST',
@@ -144,32 +163,20 @@ class Meeting(object):
 				'sid': self.user.sid
 		})
 		assert status == 200
-		self.event_pid = gevent.spawn(self._listen)
-	def _listen(self):
-		start = 0
-		while True:
-			status, resp = self.ucengine.request('GET',
-				'/event/%s?%s' % (self.meeting, urllib.urlencode({
-					'uid': self.user.uid,
-					'sid': self.user.sid,
-					'_async': 'lp',
-					'start': start
-				})))
-			if status == 200:
-				for event in resp['result']:
-					start = event['datetime'] + 1
-					if event['type'] in self.callbacks:
-						gevent.spawn(self.callbacks[event['type']], event)
-					else:
-						print event['type'], event
-	def chat(self, text, lang='en'):
-		"Talking to the meeting"
-		status, resp = self.ucengine.request('POST', '/event/%s' % self.meeting, {
+		self.event_loop('/event/%s?%s' % (self.meeting, urllib.urlencode({
 			'uid': self.user.uid,
 			'sid': self.user.sid,
-			'type': 'chat.message.new',
-			'metadata[lang]': lang,
-			'metadata[text]': text
-		})
+			'_async': 'lp'
+		})))
+	def chat(self, text, lang='en'):
+		"Talking to the meeting"
+		status, resp = self.ucengine.request('POST',
+			'/event/%s' % self.meeting, {
+				'uid': self.user.uid,
+				'sid': self.user.sid,
+				'type': 'chat.message.new',
+				'metadata[lang]': lang,
+				'metadata[text]': text
+			})
 		assert status == 201
 		return resp['result']
