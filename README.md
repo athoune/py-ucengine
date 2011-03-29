@@ -27,6 +27,17 @@ And the test (Python side)
 	cd test
 	python basic.py
 
+API
+---
+
+	uce = UCEngine('localhost', 5280)
+	victor = User('victor.goya@af83.com')
+	victor.presence(uce, 'pwd')
+	print victor.time()
+	victor.meetings['demo'].callback('chat.message.new', lambda event: print event)
+	victor.meetings['demo'].join()
+	victor.meetings['demo'].async_chat('bonjour Monde', 'fr')
+
 Code
 ----
 
