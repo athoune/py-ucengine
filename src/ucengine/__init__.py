@@ -33,10 +33,10 @@ class UCEngine(object):
 		"ask something to the server"
 		connection = httplib.HTTPConnection(self.host, self.port)
 		if body != None:
-			connection.request(method, '/api/0.4%s' % path,
+			connection.request(method, '/api/0.5%s' % path,
 				urllib.urlencode(body))
 		else:
-			connection.request(method, '/api/0.4%s' % path)
+			connection.request(method, '/api/0.5%s' % path)
 		resp = connection.getresponse()
 		response = json.loads(resp.read())
 		connection.close()
@@ -96,12 +96,13 @@ class User(Eventualy):
 		"I'm coming"
 		self.ucengine = uce
 		status, resp = self.ucengine.request('POST', '/presence/', {
-			'uid':self.uid,
+			'name':self.uid,
 			'credential':credential,
 			'metadata[nickname]': self.uid}
 			)
 		if status == 201:
-			self.sid = resp['result']
+			self.sid = resp['result']['sid']
+			self.uid = resp['result']['uid']
 			self.event_loop('/event?%s' % urllib.urlencode({
 				'uid': self.uid,
 				'sid': self.sid,
@@ -116,6 +117,7 @@ class User(Eventualy):
 				'uid': self.uid,
 				'sid': self.sid}))
 				)
+		print resp
 		if status != 200:
 			raise UCError(status, resp)
 		self.event_stop()
