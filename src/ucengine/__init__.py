@@ -84,9 +84,9 @@ class Eventualy(object):
 
 class User(Eventualy):
 	"A user"
-	def __init__(self, uid):
+	def __init__(self, name):
 		Eventualy.__init__(self)
-		self.uid = uid
+		self.name = name
 		self.sid = None
 		self.meetings = Meetings(self)
 	#def __del__(self):
@@ -96,16 +96,16 @@ class User(Eventualy):
 		"I'm coming"
 		self.ucengine = uce
 		status, resp = self.ucengine.request('POST', '/presence/', {
-			'name':self.uid,
-			'credential':credential,
-			'metadata[nickname]': self.uid}
+			'name'               : self.name,
+			'credential'         : credential,
+			'metadata[nickname]' : self.name}
 			)
 		if status == 201:
 			self.sid = resp['result']['sid']
 			self.uid = resp['result']['uid']
 			self.event_loop('/event?%s' % urllib.urlencode({
-				'uid': self.uid,
-				'sid': self.sid,
+				'uid'   : self.uid,
+				'sid'   : self.sid,
 				'_async': 'lp'
 				}))
 		else:
@@ -158,8 +158,8 @@ class Meeting(Eventualy):
 		})
 		assert status == 200
 		self.event_loop('/event/%s?%s' % (self.meeting, urllib.urlencode({
-			'uid': self.user.uid,
-			'sid': self.user.sid,
+			'uid'   : self.user.uid,
+			'sid'   : self.user.sid,
 			'_async': 'lp'
 		})))
 		return self
@@ -167,9 +167,9 @@ class Meeting(Eventualy):
 		"Talking to the meeting"
 		status, resp = self.ucengine.request('POST',
 			'/event/%s' % self.meeting, {
-				'uid': self.user.uid,
-				'sid': self.user.sid,
-				'type': 'chat.message.new',
+				'uid'           : self.user.uid,
+				'sid'           : self.user.sid,
+				'type'          : 'chat.message.new',
 				'metadata[lang]': lang,
 				'metadata[text]': text
 			})
