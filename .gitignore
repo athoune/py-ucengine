@@ -1,2 +1,4 @@
 build
 *.pyc
+src/py_ucengine.egg-info
+dist
