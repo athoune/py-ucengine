@@ -24,8 +24,7 @@ Lauch the server (Erlang side)
 
 And the test (Python side)
 
-	cd test
-	python basic.py
+	python test/basic.py
 
 API
 ---
@@ -50,4 +49,4 @@ The callback should print the event
 Code
 ----
 
-Validated with pyflakes and pylint -d W0312 (I love tabs)
+Validated with pyflakes and pylint

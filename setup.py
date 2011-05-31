@@ -3,7 +3,7 @@
 from setuptools import setup, find_packages
 
 setup(name='py-ucengine',
-      version='0.1.1',
+      version='0.2',
       package_dir={'': 'src'},
       url='http://github.com/athoune/py-ucengine',
       #scripts=[],
