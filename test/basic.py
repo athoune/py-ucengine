@@ -1,12 +1,12 @@
 import sys
 import time
 import unittest
-sys.path.append('../src')
+sys.path.insert(1, '../src')
 from ucengine import UCEngine, User, UCError
 
 class TestBasic(unittest.TestCase):
     def setUp(self):
-        self.uce = UCEngine('localhost', 5280)
+        self.uce = UCEngine('demo.ucengine.org', 5280)
         self.victor = User('victor.goya@af83.com')
         self.victor.presence(self.uce, 'pwd')
     def tearDown(self):
@@ -25,7 +25,7 @@ class TestBasic(unittest.TestCase):
         time = self.victor.time()
     def test_infos(self):
         infos = self.victor.infos()
-        self.assertEquals(u'localhost', infos['domain'])
+        self.assertEquals(u'demo.ucengine.org', infos['domain'])
     def test_meeting(self):
         thierry = User('thierry.bomandouki@af83.com')
         thierry.presence(self.uce, 'pwd')
@@ -43,9 +43,9 @@ class TestBasic(unittest.TestCase):
         # self.assertEquals(
         #     set([u'victor.goya@af83.com', u'thierry.bomandouki@af83.com']),
         #     self.victor.meetings[SESSION].roster)
-        self.assertEquals(
-            set([u'#ucengine', u'#af83']),
-            self.victor.meetings[SESSION].twitter_hash_tags)
+        #self.assertEquals(
+        #    set([u'#ucengine', u'#af83']),
+        #    self.victor.meetings[SESSION].twitter_hash_tags)
 
 
 if __name__ == '__main__':
