@@ -35,7 +35,8 @@ class UCEngine(object):
         else:
             connection.request(method, '/api/0.5%s' % path)
         resp = connection.getresponse()
-        response = json.loads(resp.read())
+        raw = resp.read()
+        response = json.loads(raw)
         connection.close()
         return resp.status, response
 
@@ -62,7 +63,8 @@ class Eventualy(object):
                         if event['type'] in self.callbacks:
                             gevent.spawn(self.callbacks[event['type']], event)
                         else:
-                            print event['type'], event
+                            pass
+                            #print event['type'], event
         self.event_pid = gevent.spawn(_listen)
     def event_stop(self):
         "stop the event loop"
