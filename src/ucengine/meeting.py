@@ -44,10 +44,10 @@ class Meeting(Eventualy):
                 'sid': self.user.sid
         })
         assert status == 200
-        self.event_loop('/event/%s?%s' % (self.meeting, urllib.urlencode({
+        self.event_loop('/live/%s?%s' % (self.meeting, urllib.urlencode({
             'uid'   : self.user.uid,
             'sid'   : self.user.sid,
-            '_async': 'lp'
+            'mode': 'longpolling'
         })))
         return self
     def chat(self, text, lang='en'):
