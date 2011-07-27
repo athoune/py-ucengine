@@ -30,10 +30,10 @@ class UCEngine(object):
         "ask something to the server"
         connection = httplib.HTTPConnection(self.host, self.port)
         if body != None:
-            connection.request(method, '/api/0.5%s' % path,
+            connection.request(method, '/api/0.6%s' % path,
                 urllib.urlencode(body))
         else:
-            connection.request(method, '/api/0.5%s' % path)
+            connection.request(method, '/api/0.6%s' % path)
         resp = connection.getresponse()
         raw = resp.read()
         response = json.loads(raw)
