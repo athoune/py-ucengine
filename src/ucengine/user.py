@@ -29,10 +29,10 @@ class User(Eventualy):
         if status == 201:
             self.sid = resp['result']['sid']
             self.uid = resp['result']['uid']
-            self.event_loop('/event?%s' % urllib.urlencode({
+            self.event_loop('/live?%s' % urllib.urlencode({
                 'uid'   : self.uid,
                 'sid'   : self.sid,
-                '_async': 'lp'
+                'mode': 'longpolling'
                 }))
         else:
             raise UCError(status, resp)
