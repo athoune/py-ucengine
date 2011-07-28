@@ -136,7 +136,7 @@ class Session(Eventualy):
         if data.credential != None:
             values['credential'] = data.credential
         status, resp = self.ucengine.request('PUT',
-            '/user/%s' % data.name,
+            '/user',
             unicode_urlencode(values)
         )
         print status, resp
