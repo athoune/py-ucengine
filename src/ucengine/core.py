@@ -35,7 +35,11 @@ class UCEngine(object):
             connection.request(method, '/api/0.6%s' % path)
         resp = connection.getresponse()
         raw = resp.read()
-        response = json.loads(raw)
+        try:
+            response = json.loads(raw)
+        except ValueError as e:
+            print raw
+            response = None
         connection.close()
         return resp.status, response
     def connect(self, user, credential):
