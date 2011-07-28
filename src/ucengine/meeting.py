@@ -31,8 +31,8 @@ class Meeting(Eventualy):
         self.twitter_hash_tags = set()
         self.callbacks = {
             'internal.roster.add': lambda event: self.roster.add(event['from']),
-            'internal.roster.delete': lambda event: self.roster.remove(
-                event['from']),
+            #'internal.roster.delete': lambda event: self.roster.remove(
+            #    event['from']),
             'twitter.hashtag.add': lambda event: self.twitter_hash_tags.add(
                 event['metadata']['hashtag'])
         }
