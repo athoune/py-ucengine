@@ -10,6 +10,8 @@ monkey.patch_all()
 import httplib
 import urllib
 
+from user import User
+
 class UCError(Exception):
     "Standard error coming from the server"
     def __init__(self, code, value):
@@ -135,6 +137,20 @@ class Session(Eventualy):
             unicode_urlencode(values)
         )
         assert status == 201
+    def users(self):
+        status, resp = self.ucengine.request('GET',
+            '/user?%s' % urllib.urlencode({
+                'uid': self.uid,
+                'sid': self.sid
+        }))
+        assert status == 200
+        us = []
+        for u in resp['result']:
+            uu = User(u['name'])
+            uu.uid = u['uid']
+            uu.metadata = u['metadata']
+            us.append(uu)
+        return us
 
 def unicode_urlencode(params):
     clean = {}
