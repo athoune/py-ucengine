@@ -35,8 +35,11 @@ class TestBasic(unittest.TestCase):
         self.assertEquals(u'localhost', infos['domain'])
 
     def test_modify_user(self):
+        owner = User('root')
+        session = self.uce.connect(owner, 'root')
+        print session.users()
         self.victor.metadata['nickname'] = "Robert les grandes oreilles"
-        self.session.save(self.victor)
+        session.save(self.victor)
     """
     def test_meeting(self):
         thierry = User('participant2')
