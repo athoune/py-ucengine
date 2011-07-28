@@ -10,25 +10,25 @@ class TestBasic(unittest.TestCase):
     def setUp(self):
         self.uce = UCEngine('localhost', 5280)
         self.victor = User('participant')
-        self.victor.presence(self.uce, 'pwd')
+        self.session = self.uce.connect(self.victor, 'pwd').loop()
 
     def tearDown(self):
-        self.victor.unpresence()
+        self.session.close()
 
     def test_presence(self):
-        self.assertTrue(None != self.victor.sid)
+        self.assertTrue(None != self.session.sid)
 
     def test_bad_presence(self):
         thierry = User('thierry')
         try:
-            thierry.presence(self.uce, '****')
+            self.uce.connect(thierry, '****')
         except UCError as e:
             self.assertEquals(404, e.code)
         else:
             self.assertTrue(False)
 
     def test_time(self):
-        time = self.victor.time()
+        time = self.session.time()
     """
     # Officialy bugged
     def test_infos(self):
@@ -37,7 +37,7 @@ class TestBasic(unittest.TestCase):
 
     def test_meeting(self):
         thierry = User('participant2')
-        thierry.presence(self.uce, 'pwd')
+        sthierry = self.uce.connect(thierry, 'pwd')
         SESSION = 'demo'
         MSG = u"Bonjour monde"
         def _m(event):
