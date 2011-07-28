@@ -32,8 +32,8 @@ class TestBasic(unittest.TestCase):
     """
     # Officialy bugged
     def test_infos(self):
-        infos = self.victor.infos()
-        self.assertEquals(u'demo.ucengine.org', infos['domain']) """
+        infos = self.session.infos()
+        self.assertEquals(u'localhost', infos['domain'])
 
     def test_meeting(self):
         thierry = User('participant2')
