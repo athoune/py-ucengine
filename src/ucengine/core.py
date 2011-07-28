@@ -124,18 +124,22 @@ class Session(Eventualy):
             raise UCError(status, resp)
         self.event_stop()
     def save(self, data):
-        #assert data is a User
+        #assert data is a User. Visitor pattern.
         values = {
+                'name': "beuha",
+                'auth': 'machin',
+                'credential': 'popo',
                 'uid': self.uid,
                 'sid': self.sid,
                 #'metadata': data.metadata
             }
         if data.credential != None:
             values['credential'] = data.credential
-        status, resp = self.ucengine.request('POST',
+        status, resp = self.ucengine.request('PUT',
             '/user/%s' % data.name,
             unicode_urlencode(values)
         )
+        print status, resp
         assert status == 201
     def users(self):
         status, resp = self.ucengine.request('GET',
