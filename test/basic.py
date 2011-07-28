@@ -29,12 +29,15 @@ class TestBasic(unittest.TestCase):
 
     def test_time(self):
         time = self.session.time()
-    """
-    # Officialy bugged
+
     def test_infos(self):
         infos = self.session.infos()
         self.assertEquals(u'localhost', infos['domain'])
 
+    def test_modify_user(self):
+        self.victor.metadata['nickname'] = "Robert les grandes oreilles"
+        self.session.save(self.victor)
+    """
     def test_meeting(self):
         thierry = User('participant2')
         sthierry = self.uce.connect(thierry, 'pwd')
@@ -55,6 +58,7 @@ class TestBasic(unittest.TestCase):
         #self.assertEquals(
         #    set([u'#ucengine', u'#af83']),
         #    self.victor.meetings[SESSION].twitter_hash_tags)
+"""
 
 if __name__ == '__main__':
     unittest.main()

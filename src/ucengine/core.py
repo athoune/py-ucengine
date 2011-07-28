@@ -117,4 +117,27 @@ class Session(Eventualy):
         if status != 200:
             raise UCError(status, resp)
         self.event_stop()
+    def save(self, data):
+        #assert data is a User
+        values = {
+                'uid': self.uid,
+                'sid': self.sid,
+                #'metadata': data.metadata
+            }
+        if data.credential != None:
+            values['credential'] = data.credential
+        status, resp = self.ucengine.request('POST',
+            '/user/%s' % data.name,
+            unicode_urlencode(values)
+        )
+        assert status == 201
+
+def unicode_urlencode(params):
+    clean = {}
+    for k, v in params.items():
+        if isinstance(v, unicode):
+            clean[k] = v.encode('utf-8')
+        else:
+            clean[k] = v
+    return clean
  
