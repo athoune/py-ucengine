@@ -3,7 +3,7 @@ import time
 import unittest
 import os.path
 sys.path.insert(1, os.path.abspath('src'))
-from ucengine import UCEngine, User, UCError
+from ucengine import UCEngine, User
 
 class TestBasic(unittest.TestCase):
 
@@ -38,8 +38,9 @@ class TestBasic(unittest.TestCase):
         owner = User('root')
         session = self.uce.connect(owner, 'root')
         print session.users()
-        self.victor.metadata['nickname'] = "Robert les grandes oreilles"
-        session.save(self.victor)
+        bob = User('Bob')
+        bob.metadata['nickname'] = "Robert les grandes oreilles"
+        session.save(bob)
     """
     def test_meeting(self):
         thierry = User('participant2')

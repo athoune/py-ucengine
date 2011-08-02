@@ -1,32 +1,17 @@
 __author__ = "mathieu@garambrogne.net"
 
-from ucengine.core import Eventualy
-
-from gevent import monkey
-import gevent
-
-monkey.patch_all()
+from core import Eventualy
 
 import urllib
 
-class Meetings(object):
-    "Lazy dictionnary for handling meetings"
-    def __init__(self, user):
-        self.meetings = {}
-        self.user = user
-    def __getitem__(self, meeting):
-        if not meeting in self.meetings:
-            self.meetings[meeting] = Meeting(meeting)
-            self.meetings[meeting].ucengine = self.user.ucengine
-            self.meetings[meeting].user = self.user
-        return self.meetings[meeting]
-
 class Meeting(Eventualy):
     "A meeting (a room)"
-    def __init__(self, meeting):
+    def __init__(self, namei, start=0, end="never", metadata={}):
         Eventualy.__init__(self)
-        self.user = None
-        self.meeting = meeting
+        self.name = name
+        self.start = start
+        self.end = end
+        self.metadata = metadatada
         self.roster = set()
         self.twitter_hash_tags = set()
         self.callbacks = {
