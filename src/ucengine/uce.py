@@ -7,10 +7,12 @@ from session import Session
 
 class UCEngine(object):
     "The Server"
+
     def __init__(self, host, port):
         self.host = host
         self.port = port
         self.users = []
+
     def request(self, method, path, body=None):
         "ask something to the server"
         connection = httplib.HTTPConnection(self.host, self.port)
@@ -28,6 +30,7 @@ class UCEngine(object):
             response = None
         connection.close()
         return resp.status, response
+
     def connect(self, user, credential):
         status, resp = self.request('POST', '/presence/', {
             'name'               : user.name,

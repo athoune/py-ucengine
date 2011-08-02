@@ -12,23 +12,28 @@ import urllib
 
 class UCError(Exception):
     "Standard error coming from the server"
+
     def __init__(self, code, value):
         Exception.__init__(self)
         self.code = code
         self.value = value
+
     def __repr__(self):
         return "<UCError:%i %s>" % (self.code, self.value)
 
 class Eventualy(object):
     "Dummy object implementing event loop"
+
     def __init__(self):
         self.callbacks = {}
         self.event_pid = None
         self.ucengine = None
+
     def callback(self, key, cback):
         "register a new callback"
         self.callbacks[key] = cback
         return self
+
     def event_loop(self, url):
         "launch the backround event listening"
         def _listen():
@@ -45,6 +50,7 @@ class Eventualy(object):
                             pass
                             #print event['type'], event
         self.event_pid = gevent.spawn(_listen)
+
     def event_stop(self):
         "stop the event loop"
         self.event_pid.kill()

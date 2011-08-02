@@ -3,7 +3,7 @@ import time
 import unittest
 import os.path
 sys.path.insert(1, os.path.abspath('src'))
-from ucengine import UCEngine, User
+from ucengine import UCEngine, User, UCError
 
 class TestBasic(unittest.TestCase):
 

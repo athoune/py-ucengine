@@ -5,11 +5,13 @@ from user import User
 from meeting import Meeting
 
 class Session(Eventualy):
+
     def __init__(self, uce, uid, sid):
         Eventualy.__init__(self)
         self.ucengine = uce
         self.uid = uid
         self.sid = sid
+
     def time(self):
         "What time is it"
         status, resp = self.ucengine.request('GET',
@@ -17,6 +19,7 @@ class Session(Eventualy):
                 'uid': self.uid, 'sid': self.sid}))
         assert status == 200
         return resp['result']
+
     def infos(self):
         "Infos about the server"
         status, resp = self.ucengine.request('GET',
@@ -24,6 +27,7 @@ class Session(Eventualy):
             'uid': self.uid, 'sid': self.sid}))
         assert status == 200
         return resp['result']
+
     def loop(self):
         self.event_loop('/live?%s' % urllib.urlencode({
                 'uid'   : self.uid,
@@ -31,6 +35,7 @@ class Session(Eventualy):
                 'mode': 'longpolling'
                 }))
         return self
+
     def close(self):
         "I'm leaving"
         status, resp = self.ucengine.request('DELETE',
@@ -42,11 +47,13 @@ class Session(Eventualy):
         if status != 200:
             raise UCError(status, resp)
         self.event_stop()
+
     def save(self, data):
         if issubclass(data.__class__, User):
             self._save_user(data)
         if issubclass(data.__class__, Meeting):
             self._save_meeting(data)
+
     def _save_meeting(self, data):
         values = {
             'start': data.start,
@@ -68,6 +75,7 @@ class Session(Eventualy):
             '/meeting/all/',
             unicode_urlencode(values))
             assert status == 201
+
     def _save_user(self, data):
         #assert data is a User. Visitor pattern.
         values = {
@@ -79,8 +87,10 @@ class Session(Eventualy):
                 #'metadata': data.metadata
             }
         status, resp =  self.ucengine.request('GET',
-            '/user/%s?%s' % (data.name, urllib.urlencode({'uid':self.uid, 'sid': self.sid})))
-        print("GET : ", status, resp)
+            '/find/user/?%s' % urllib.urlencode({
+                'by_name': data.name,
+                'uid':self.uid,
+                'sid': self.sid}))
         if status == 200:
             data.uid = resp['result']['uid']
             status, resp = self.ucengine.request('PUT',
@@ -95,11 +105,13 @@ class Session(Eventualy):
             )
             print status, resp
             assert status == 201
+
     def delete(self, data):
         if issubclass(data.__class__, User):
             status, resp = self.ucengine.request('DELETE',
                 '/user/%s?%s' % (data.uid, urllib.urlencode({'uid':self.uid, 'sid': self.sid})))
             assert status == 200
+
     def users(self):
         status, resp = self.ucengine.request('GET',
             '/user?%s' % urllib.urlencode({
@@ -114,5 +126,3 @@ class Session(Eventualy):
             uu.metadata = u['metadata']
             us.append(uu)
         return us
-
-

@@ -7,6 +7,7 @@ from core import Eventualy
 
 class Meeting(Eventualy):
     "A meeting (a room)"
+
     def __init__(self, namei, start=0, end="never", metadata={}):
         Eventualy.__init__(self)
         self.name = name
@@ -22,6 +23,7 @@ class Meeting(Eventualy):
             'twitter.hashtag.add': lambda event: self.twitter_hash_tags.add(
                 event['metadata']['hashtag'])
         }
+
     def join(self):
         "Joining the meeting"
         status, resp = self.ucengine.request('POST',
@@ -36,6 +38,7 @@ class Meeting(Eventualy):
             'mode': 'longpolling'
         })))
         return self
+
     def chat(self, text, lang='en'):
         "Talking to the meeting"
         status, resp = self.ucengine.request('POST',
@@ -48,6 +51,7 @@ class Meeting(Eventualy):
             })
         assert status == 201
         return resp['result']
+
     def async_chat(self, text, lang='en'):
         gevent.spawn(self.chat, text, lang)
         return self
