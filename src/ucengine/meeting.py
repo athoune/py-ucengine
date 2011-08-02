@@ -1,8 +1,9 @@
 __author__ = "mathieu@garambrogne.net"
 
-from core import Eventualy
-
 import urllib
+import gevent
+
+from core import Eventualy
 
 class Meeting(Eventualy):
     "A meeting (a room)"
