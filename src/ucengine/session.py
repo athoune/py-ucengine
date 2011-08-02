@@ -29,6 +29,7 @@ class Session(Eventualy):
         return resp['result']
 
     def loop(self):
+        "Listen the events"
         self.event_loop('/live?%s' % urllib.urlencode({
                 'uid'   : self.uid,
                 'sid'   : self.sid,
@@ -49,6 +50,7 @@ class Session(Eventualy):
         self.event_stop()
 
     def save(self, data):
+        "Save a user or a meeting"
         if issubclass(data.__class__, User):
             self._save_user(data)
         if issubclass(data.__class__, Meeting):
@@ -86,6 +88,7 @@ class Session(Eventualy):
                 'sid': self.sid,
                 #'metadata': data.metadata
             }
+        #@TODO: don't do that if data.uid != None
         status, resp =  self.ucengine.request('GET',
             '/find/user/?%s' % urllib.urlencode({
                 'by_name': data.name,
@@ -107,12 +110,14 @@ class Session(Eventualy):
             assert status == 201
 
     def delete(self, data):
+        "Delete a user or a meeting"
         if issubclass(data.__class__, User):
             status, resp = self.ucengine.request('DELETE',
                 '/user/%s?%s' % (data.uid, urllib.urlencode({'uid':self.uid, 'sid': self.sid})))
             assert status == 200
 
     def users(self):
+        "Get all users"
         status, resp = self.ucengine.request('GET',
             '/user?%s' % urllib.urlencode({
                 'uid': self.uid,
@@ -121,8 +126,9 @@ class Session(Eventualy):
         assert status == 200
         us = []
         for u in resp['result']:
-            uu = User(u['name'])
-            uu.uid = u['uid']
-            uu.metadata = u['metadata']
-            us.append(uu)
+            us.append(
+                User(u['name'],
+                    metadata = u['metadata'],
+                    uid = u['uid'])
+            )
         return us
