@@ -1,14 +1,9 @@
 __author__ = "mathieu@garambrogne.net"
 
-import json
-
 from gevent import monkey
 import gevent
 
 monkey.patch_all()
-
-import httplib
-import urllib
 
 class UCError(Exception):
     "Standard error coming from the server"

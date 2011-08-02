@@ -1,10 +1,5 @@
 __author__ = "mathieu@garambrogne.net"
 
-from gevent import monkey
-monkey.patch_all()
-
-import urllib
-
 class User(object):
     "A user"
 
