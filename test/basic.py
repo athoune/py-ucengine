@@ -34,6 +34,12 @@ class TestBasic(unittest.TestCase):
         infos = self.session.infos()
         self.assertEquals(u'localhost', infos['domain'])
 
+    def test_user(self):
+        pass
+        #FIXME: 401!
+        #v = self.session.user('participant')
+        #self.assertTrue(None != v)
+
     def test_modify_user(self):
         owner = User('root')
         session = self.uce.connect(owner, 'root')

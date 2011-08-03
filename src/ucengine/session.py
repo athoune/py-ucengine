@@ -132,3 +132,19 @@ class Session(Eventualy):
                     uid = u['uid'])
             )
         return us
+
+    def user(self, name):
+        "Get a user"
+        status, resp =  self.ucengine.request('GET',
+            '/find/user/?%s' % urllib.urlencode({
+                'by_name': name,
+                'uid':self.uid,
+                'sid': self.sid}))
+        if status == 404:
+            return None
+        print status
+        assert status == 200
+        u = resp['result']
+        return User(u['name'],
+                    metadata = u['metadata'],
+                    uid = u['uid'])
