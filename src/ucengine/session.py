@@ -148,3 +148,19 @@ class Session(Eventualy):
         return User(u['name'],
                     metadata = u['metadata'],
                     uid = u['uid'])
+
+    def meeting(self, name):
+        "Get a mmeting"
+        status, resp = self.ucengine.request('GET',
+            '/meeting/all/%s?%s' % (name, urllib.urlencode({
+                'uid': self.uid,
+                'sid': self.sid
+        })))
+        if status == 404:
+            return None
+        assert status == 200
+        m = resp['result']
+        return Meeting(name,
+            start = m['start_date'],
+            end = m['end_date'],
+            metadata = m['metadata'])

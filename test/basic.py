@@ -47,6 +47,10 @@ class TestBasic(unittest.TestCase):
         bob = User('Bob')
         bob.metadata['nickname'] = "Robert les grandes oreilles"
         session.save(bob)
+
+    def test_meeting(self):
+        meeting = self.session.meeting('demo')
+        self.assertTrue(None != meeting)
     """
     def test_meeting(self):
         thierry = User('participant2')
