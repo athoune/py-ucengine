@@ -8,12 +8,12 @@ from core import Eventualy
 class Meeting(Eventualy):
     "A meeting (a room)"
 
-    def __init__(self, namei, start=0, end="never", metadata={}):
+    def __init__(self, name, start=0, end="never", metadata={}):
         Eventualy.__init__(self)
         self.name = name
         self.start = start
         self.end = end
-        self.metadata = metadatada
+        self.metadata = metadata
         self.roster = set()
         self.twitter_hash_tags = set()
         self.callbacks = {
@@ -23,6 +23,9 @@ class Meeting(Eventualy):
             'twitter.hashtag.add': lambda event: self.twitter_hash_tags.add(
                 event['metadata']['hashtag'])
         }
+
+    def __repr__(self):
+        return "<Meeting name:%s>" % self.name
 
     def join(self):
         "Joining the meeting"
