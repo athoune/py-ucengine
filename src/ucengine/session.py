@@ -12,6 +12,10 @@ class Session(Eventualy):
         self.uid = uid
         self.sid = sid
 
+    #FIXME handling authentification
+    def request(self, method, url, body={}, expect=200):
+        pass
+
     def time(self):
         "What time is it"
         status, resp = self.ucengine.request('GET',

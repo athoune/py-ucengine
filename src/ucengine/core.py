@@ -5,6 +5,7 @@ import gevent
 
 monkey.patch_all()
 
+#FIXME one error per HTTP error : 400, 401, 404, 500
 class UCError(Exception):
     "Standard error coming from the server"
 

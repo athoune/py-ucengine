@@ -13,11 +13,12 @@ class UCEngine(object):
         self.port = port
         self.users = []
 
-    def request(self, method, path, body=None):
+    def request(self, method, path, body=None, expect=200):
         "ask something to the server"
         connection = httplib.HTTPConnection(self.host, self.port)
         if body != None:
             connection.request(method, '/api/0.6%s' % path,
+                #FIXME handling here the UTF8 bug
                 urllib.urlencode(body))
         else:
             connection.request(method, '/api/0.6%s' % path)
@@ -29,6 +30,7 @@ class UCEngine(object):
             print raw
             response = None
         connection.close()
+        #FIXME throw an error or return the response result
         return resp.status, response
 
     def connect(self, user, credential):
