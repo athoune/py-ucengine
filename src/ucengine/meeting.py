@@ -7,6 +7,7 @@ from core import Eventualy
 
 class Channel(Eventualy):
     "A plain old channel"
+
     def __init__(self, name):
         self.channel = name
 
@@ -59,16 +60,13 @@ class Meeting(Channel):
 
     def chat(self, text, lang='en'):
         "Talking to the meeting"
-        status, resp = self.ucengine.request('POST',
-            '/event/%s' % self.meeting, {
+        return self.send({
                 'uid'           : self.user.uid,
                 'sid'           : self.user.sid,
                 'type'          : 'chat.message.new',
                 'metadata[lang]': lang,
                 'metadata[text]': text
             })
-        assert status == 201
-        return resp['result']
 
     def async_chat(self, text, lang='en'):
         gevent.spawn(self.chat, text, lang)
