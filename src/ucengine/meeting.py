@@ -5,7 +5,37 @@ import gevent
 
 from core import Eventualy
 
-class Meeting(Eventualy):
+class Channel(Eventualy):
+    "A plain old channel"
+    def __init__(self, name):
+        self.channel = name
+
+    def join(self):
+        "Joining the meeting"
+        status, resp = self.ucengine.request('POST',
+            '/meeting/all/%s/roster/' % self.meeting, {
+                'uid': self.user.uid,
+                'sid': self.user.sid
+        })
+        assert status == 200
+        self.event_loop('/live/%s?%s' % (self.meeting, urllib.urlencode({
+            'uid'   : self.user.uid,
+            'sid'   : self.user.sid,
+            'mode': 'longpolling'
+        })))
+        return self
+
+    def send(self, event):
+        status, resp = self.ucengine.request('POST',
+            '/event/%s' % self.channel, event)
+        assert status == 201
+        return resp['result']
+
+    def async_send(self, event):
+        gevent.spawn(self.send, event)
+        return self
+
+class Meeting(Channel):
     "A meeting (a room)"
 
     def __init__(self, name, start=0, end="never", metadata={}):
@@ -26,21 +56,6 @@ class Meeting(Eventualy):
 
     def __repr__(self):
         return "<Meeting name:%s>" % self.name
-
-    def join(self):
-        "Joining the meeting"
-        status, resp = self.ucengine.request('POST',
-            '/meeting/all/%s/roster/' % self.meeting, {
-                'uid': self.user.uid,
-                'sid': self.user.sid
-        })
-        assert status == 200
-        self.event_loop('/live/%s?%s' % (self.meeting, urllib.urlencode({
-            'uid'   : self.user.uid,
-            'sid'   : self.user.sid,
-            'mode': 'longpolling'
-        })))
-        return self
 
     def chat(self, text, lang='en'):
         "Talking to the meeting"
