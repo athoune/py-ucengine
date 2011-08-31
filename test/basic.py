@@ -1,5 +1,5 @@
 import sys
-import time
+#import time
 import unittest
 import os.path
 sys.path.insert(1, os.path.abspath('src'))
@@ -28,7 +28,8 @@ class TestBasic(unittest.TestCase):
             self.assertTrue(False)
 
     def test_time(self):
-        time = self.session.time()
+        stime = self.session.time()
+        self.assertEquals(long, type(stime))
 
     def test_infos(self):
         infos = self.session.infos()

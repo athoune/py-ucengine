@@ -1,8 +1,8 @@
 import urllib
 
-from core import Eventualy, unicode_urlencode
-from user import User
-from meeting import Meeting
+from core import Eventualy, unicode_urlencode, UCError
+from user import User, Client
+from meeting import Meeting, Channel
 
 class Session(Eventualy):
 
@@ -55,9 +55,9 @@ class Session(Eventualy):
 
     def save(self, data):
         "Save a user or a meeting"
-        if issubclass(data.__class__, User):
+        if issubclass(data.__class__, Client):
             self._save_user(data)
-        if issubclass(data.__class__, Meeting):
+        if issubclass(data.__class__, Channel):
             self._save_meeting(data)
 
     def _save_meeting(self, data):
@@ -115,7 +115,7 @@ class Session(Eventualy):
 
     def delete(self, data):
         "Delete a user or a meeting"
-        if issubclass(data.__class__, User):
+        if issubclass(data.__class__, Client):
             status, resp = self.ucengine.request('DELETE',
                 '/user/%s?%s' % (data.uid, urllib.urlencode({'uid':self.uid, 'sid': self.sid})))
             assert status == 200
